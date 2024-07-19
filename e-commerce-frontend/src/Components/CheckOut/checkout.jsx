@@ -27,142 +27,36 @@ function Checkout() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
-        // Basic form validation
         if (!checkoutInput.firstname || !checkoutInput.lastname || !checkoutInput.phone || !checkoutInput.email || !checkoutInput.address || !checkoutInput.city || !checkoutInput.state || !checkoutInput.zipcode) {
             setError({ message: 'All fields are mandatory' });
             return;
         }
-
-        // Simulating loading state
         setLoading(true);
-
-        // Simulate order placement or payment processing (setTimeout for demo purposes)
         setTimeout(() => {
-            // Simulate success
             setLoading(false);
             setError({});
             alert('Order placed successfully!');
-            // Optionally redirect to a thank you page or clear form inputs
         }, 500);
     };
 
-    // const handleRazorpayPayment = async () => {
-    //     setLoading(true);
-    //     try {
-    //         // Create an order on the backend
-    //         const orderResponse = await axios.post('http://localhost:5000/create-order', {
-    //             amount: 1000 * 100, // Amount in paise
-    //             currency: 'INR',
-    //             receipt: 'receipt_order_74394' // Unique receipt number
-    //         });
-
-    //         const { id, amount, currency } = orderResponse.data;
-
-    //         const options = {
-    //             key: 'YOUR_RAZORPAY_KEY_ID', // Replace with your Razorpay Key ID
-    //             amount: amount,
-    //             currency: currency,
-    //             name: 'Your Company Name',
-    //             description: 'Test Transaction',
-    //             image: 'https://example.com/your_logo',
-    //             order_id: id,
-    //             handler: async function (response) {
-    //                 // Verify payment on the backend
-    //                 const verifyResponse = await axios.post('http://localhost:5000/verify-payment', {
-    //                     razorpay_order_id: response.razorpay_order_id,
-    //                     razorpay_payment_id: response.razorpay_payment_id,
-    //                     razorpay_signature: response.razorpay_signature
-    //                 });
-
-    //                 if (verifyResponse.data.status === 'success') {
-    //                     alert('Payment successful!');
-    //                 } else {
-    //                     alert('Payment verification failed!');
-    //                 }
-    //             },
-    //             prefill: {
-    //                 name: checkoutInput.firstname + " " + checkoutInput.lastname,
-    //                 email: checkoutInput.email,
-    //                 contact: checkoutInput.phone,
-    //             },
-    //             notes: {
-    //                 address: checkoutInput.address
-    //             },
-    //             theme: {
-    //                 color: '#3399cc'
-    //             }
-    //         };
-
-    //         const rzp1 = new window.Razorpay(options);
-    //         rzp1.open();
-    //     } catch (error) {
-    //         alert('Something went wrong. Please try again later.');
-    //     }
-    //     setLoading(false);
-    // };
-
-    const handleRazorpayPayment = async () => {
+    const handleESEWA = async () => {
         setLoading(true);
         try {
-            // Create an order on the backend
-            const orderResponse = await axios.post('http://localhost:4000/create-order', {
+            const orderResponse = await axios.post('http://localhost:4000/create-esewa-payment', {
                 amount: 1000 * 100, // Amount in paise
-                currency: 'INR',
-                receipt: 'receipt_order_74394' // Unique receipt number
+                orderId: 'order_id_' + Date.now()
             });
-    
-            const { id, amount, currency } = orderResponse.data;
-    
-            const options = {
-                key: 'YOUR_RAZORPAY_KEY_ID', // Replace with your Razorpay Key ID
-                amount: amount,
-                currency: currency,
-                name: 'Your Company Name',
-                description: 'Test Transaction',
-                image: 'https://example.com/your_logo', // Optional logo
-                order_id: id,
-                handler: async function (response) {
-                    try {
-                        // Verify payment on the backend
-                        const verifyResponse = await axios.post('http://localhost:4000/verify-payment', {
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature
-                        });
-    
-                        if (verifyResponse.data.status === 'success') {
-                            alert('Payment successful!');
-                        } else {
-                            alert('Payment verification failed!');
-                        }
-                    } catch (error) {
-                        alert('Payment verification failed!');
-                        console.error('Verification error:', error);
-                    }
-                },
-                prefill: {
-                    name: `${checkoutInput.firstname} ${checkoutInput.lastname}`,
-                    email: checkoutInput.email,
-                    contact: checkoutInput.phone,
-                },
-                notes: {
-                    address: checkoutInput.address
-                },
-                theme: {
-                    color: '#3399cc'
-                }
-            };
-    
-            const rzp1 = new window.Razorpay(options);
-            rzp1.open();
+
+            const { url, token, amount, orderId, merchantId } = orderResponse.data;
+
+            // Redirect to eSewa
+            window.location.href = `${url}?amt=${amount}&rid=${orderId}&scd=${merchantId}&token=${token}`;
         } catch (error) {
+            console.error('Payment error:', error);
             alert('Something went wrong. Please try again later.');
-            console.error('Order creation error:', error);
         }
         setLoading(false);
     };
-    
 
     return (
         <div className="container">
@@ -176,6 +70,7 @@ function Checkout() {
                         <div className="card-body">
                             <form id="checkoutForm" onSubmit={handleSubmit}>
                                 <div className="row">
+                                    {/* Form fields */}
                                     <div className="col-md-6">
                                         <div className="form-group">
                                             <label>First Name</label>
@@ -235,7 +130,7 @@ function Checkout() {
                                     <div className="col-md-12">
                                         <div className="form-group text-end">
                                             <button type="submit" className="btn btn-primary mx-1" disabled={loading}>Place Order</button>
-                                            <button type="button" className="btn btn-primary mx-1" onClick={handleRazorpayPayment} disabled={loading}>Pay by Razorpay</button>
+                                            <button type="button" className="btn btn-primary mx-1" onClick={handleESEWA} disabled={loading}>Pay with eSewa</button>
                                         </div>
                                     </div>
                                 </div>
