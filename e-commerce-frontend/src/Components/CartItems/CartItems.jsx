@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import "./CartItems.css";
 import cross_icon from "../Assets/cart_cross_icon.png";
 import { Link } from "react-router-dom";
@@ -8,6 +8,25 @@ const CartItems = () => {
   const { products, cartItems, removeFromCart, getTotalCartAmount } = useContext(
     ShopContext
   );
+
+  // State for promo code input and error message
+  const [promoCode, setPromoCode] = useState("");
+  const [promoError, setPromoError] = useState("");
+  const [promoApplied, setPromoApplied] = useState(false);
+
+  // Function to handle promo code submission
+  const applyPromoCode = () => {
+    // Reset promo error message
+    setPromoError("");
+
+    // Example: Check if promo code is valid (you can replace this with your logic)
+    if (promoCode === "SUMMER50") {
+      // Apply 50% discount (example)
+      setPromoApplied(true);
+    } else {
+      setPromoError("Invalid promo code");
+    }
+  };
 
   const confirmRemove = (productId, productName) => {
     const confirmDelete = window.confirm(`Are you sure you want to remove "${productName}" from cart?`);
@@ -76,16 +95,25 @@ const CartItems = () => {
             </div>
           </div>
 
+          {/* Display promo code input and apply button */}
+          <div className="cartitems-promocode">
+            <p>If you have a promo code, Enter it here</p>
+            <div className="cartitems-promobox">
+              <input
+                type="text"
+                placeholder="Enter promo code"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value)}
+              />
+              <button onClick={applyPromoCode}>Submit</button>
+            </div>
+            {promoError && <p className="error">{promoError}</p>}
+            {promoApplied && <p className="success">Promo code applied successfully!</p>}
+          </div>
+
           <Link to="/checkout">
             <button>PROCEED TO CHECKOUT</button>
           </Link>
-        </div>
-        <div className="cartitems-promocode">
-          <p>If you have a promo code, Enter it here</p>
-          <div className="cartitems-promobox">
-            <input type="text" placeholder="promo code" />
-            <button>Submit</button>
-          </div>
         </div>
       </div>
     </div>

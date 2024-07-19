@@ -7,11 +7,54 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 
+
+const bodyParser = require('body-parser');
+const Razorpay = require('razorpay');
+
+app.use(bodyParser.json());
+ 
 app.use(express.json());
 app.use(cors());
 
 // Database Connection With MongoDB
 mongoose.connect("mongodb+srv://dileep02:dileep4819@cluster0.gbsppdj.mongodb.net/e-commerce"); 
+
+
+// backened for payment
+const razorpay = new Razorpay({
+  key_id: 'YOUR_RAZORPAY_KEY_ID', // Replace with your Razorpay Key ID
+  key_secret: 'YOUR_RAZORPAY_KEY_SECRET' // Replace with your Razorpay Key Secret
+});
+
+app.post('/create-order', async (req, res) => {
+  const { amount, currency, receipt } = req.body;
+
+  try {
+    const order = await razorpay.orders.create({ amount, currency, receipt });
+    res.json(order);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+app.post('/verify-payment', (req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+  const crypto = require('crypto');
+  const hmac = crypto.createHmac('sha256', 'YOUR_RAZORPAY_KEY_SECRET');
+  
+  hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
+  const generatedSignature = hmac.digest('hex');
+
+  if (generatedSignature === razorpay_signature) {
+    res.json({ status: 'success' });
+  } else {
+    res.status(400).json({ status: 'failure' });
+  }
+});
+
+// backened for payment
+
 
 
 
@@ -248,3 +291,6 @@ app.listen(port, (error) => {
   if (!error) console.log("Server Running on port " + port);
   else console.log("Error : ", error);
 });
+
+
+

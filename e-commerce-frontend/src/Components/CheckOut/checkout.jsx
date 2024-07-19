@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-
+import axios from 'axios';
+import './checkout.css';
 
 function Checkout() {
     const [checkoutInput, setCheckoutInput] = useState({
@@ -44,11 +44,128 @@ function Checkout() {
             setError({});
             alert('Order placed successfully!');
             // Optionally redirect to a thank you page or clear form inputs
-        }, 2000);
+        }, 500);
     };
 
+    // const handleRazorpayPayment = async () => {
+    //     setLoading(true);
+    //     try {
+    //         // Create an order on the backend
+    //         const orderResponse = await axios.post('http://localhost:5000/create-order', {
+    //             amount: 1000 * 100, // Amount in paise
+    //             currency: 'INR',
+    //             receipt: 'receipt_order_74394' // Unique receipt number
+    //         });
+
+    //         const { id, amount, currency } = orderResponse.data;
+
+    //         const options = {
+    //             key: 'YOUR_RAZORPAY_KEY_ID', // Replace with your Razorpay Key ID
+    //             amount: amount,
+    //             currency: currency,
+    //             name: 'Your Company Name',
+    //             description: 'Test Transaction',
+    //             image: 'https://example.com/your_logo',
+    //             order_id: id,
+    //             handler: async function (response) {
+    //                 // Verify payment on the backend
+    //                 const verifyResponse = await axios.post('http://localhost:5000/verify-payment', {
+    //                     razorpay_order_id: response.razorpay_order_id,
+    //                     razorpay_payment_id: response.razorpay_payment_id,
+    //                     razorpay_signature: response.razorpay_signature
+    //                 });
+
+    //                 if (verifyResponse.data.status === 'success') {
+    //                     alert('Payment successful!');
+    //                 } else {
+    //                     alert('Payment verification failed!');
+    //                 }
+    //             },
+    //             prefill: {
+    //                 name: checkoutInput.firstname + " " + checkoutInput.lastname,
+    //                 email: checkoutInput.email,
+    //                 contact: checkoutInput.phone,
+    //             },
+    //             notes: {
+    //                 address: checkoutInput.address
+    //             },
+    //             theme: {
+    //                 color: '#3399cc'
+    //             }
+    //         };
+
+    //         const rzp1 = new window.Razorpay(options);
+    //         rzp1.open();
+    //     } catch (error) {
+    //         alert('Something went wrong. Please try again later.');
+    //     }
+    //     setLoading(false);
+    // };
+
+    const handleRazorpayPayment = async () => {
+        setLoading(true);
+        try {
+            // Create an order on the backend
+            const orderResponse = await axios.post('http://localhost:4000/create-order', {
+                amount: 1000 * 100, // Amount in paise
+                currency: 'INR',
+                receipt: 'receipt_order_74394' // Unique receipt number
+            });
+    
+            const { id, amount, currency } = orderResponse.data;
+    
+            const options = {
+                key: 'YOUR_RAZORPAY_KEY_ID', // Replace with your Razorpay Key ID
+                amount: amount,
+                currency: currency,
+                name: 'Your Company Name',
+                description: 'Test Transaction',
+                image: 'https://example.com/your_logo', // Optional logo
+                order_id: id,
+                handler: async function (response) {
+                    try {
+                        // Verify payment on the backend
+                        const verifyResponse = await axios.post('http://localhost:4000/verify-payment', {
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        });
+    
+                        if (verifyResponse.data.status === 'success') {
+                            alert('Payment successful!');
+                        } else {
+                            alert('Payment verification failed!');
+                        }
+                    } catch (error) {
+                        alert('Payment verification failed!');
+                        console.error('Verification error:', error);
+                    }
+                },
+                prefill: {
+                    name: `${checkoutInput.firstname} ${checkoutInput.lastname}`,
+                    email: checkoutInput.email,
+                    contact: checkoutInput.phone,
+                },
+                notes: {
+                    address: checkoutInput.address
+                },
+                theme: {
+                    color: '#3399cc'
+                }
+            };
+    
+            const rzp1 = new window.Razorpay(options);
+            rzp1.open();
+        } catch (error) {
+            alert('Something went wrong. Please try again later.');
+            console.error('Order creation error:', error);
+        }
+        setLoading(false);
+    };
+    
+
     return (
-        <div className="container mt-5">
+        <div className="container">
             <h2 className="text-center mb-5">Checkout</h2>
             <div className="row">
                 <div className="col-md-7">
@@ -118,42 +235,11 @@ function Checkout() {
                                     <div className="col-md-12">
                                         <div className="form-group text-end">
                                             <button type="submit" className="btn btn-primary mx-1" disabled={loading}>Place Order</button>
-                                            <button type="button" className="btn btn-primary mx-1" disabled={loading}>Pay by Razorpay</button>
-                                            <button type="button" className="btn btn-warning mx-1" disabled={loading}>Pay Online</button>
+                                            <button type="button" className="btn btn-primary mx-1" onClick={handleRazorpayPayment} disabled={loading}>Pay by Razorpay</button>
                                         </div>
                                     </div>
                                 </div>
                             </form>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-md-5">
-                    <div className="card">
-                        <div className="card-body">
-                            <table className="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Product Name</th>
-                                        <th>Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Product 1</td>
-                                        <td>Rs100.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Product 2</td>
-                                        <td>Rs50.00</td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td>Total</td>
-                                        <td>Rs150.00</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
                         </div>
                     </div>
                 </div>
