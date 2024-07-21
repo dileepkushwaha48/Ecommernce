@@ -85,7 +85,7 @@ function Checkout() {
 
             const { amount, currency, transactionId } = orderResponse.data;
 
-            // Here you would implement the eSewa payment flow
+            
             // For example, redirect to eSewa payment page
             window.location.href = `https://esewa.com.np/epay/main?amt=${amount}&txAmt=0&psc=0&sc=0&pid=${transactionId}&su=http://localhost:4000/payment-success&fu=http://localhost:4000/payment-failure`;
 
