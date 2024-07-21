@@ -1,71 +1,69 @@
-.user {
-    max-width: 800px;
-    margin: 0 auto;
+/* user.css */
+
+.admin-panel {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 800px;
+  padding: 30px 50px;
+  margin: 20px auto;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.admin-panel h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+thead {
+  background-color: #f4f4f4;
+}
+
+th, td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+}
+
+td {
+  font-size: 14px;
+  color: #555;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+@media (max-width: 800px) {
+  .admin-panel {
     padding: 20px;
+    margin: 10px;
   }
-  
-  .user h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
+
+  th, td {
+    padding: 8px;
+    font-size: 14px;
   }
-  
-  .listproduct-format-main {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
-    font-weight: bold;
+
+  .admin-panel h1 {
+    font-size: 20px;
   }
-  
-  .listproduct-format-main p {
-    text-align: center;
-  }
-  
-  .listproduct-allproducts {
-    margin-top: 10px;
-  }
-  
-  .listproduct-format-main.listproduct-format {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
-  }
-  
-  .listproduct-format-main.listproduct-format img {
-    max-width: 100%;
-    height: auto;
-  }
-  
-  .listproduct-remove-icon {
-    cursor: pointer;
-  }
-  
-  @media (max-width: 768px) {
-    .listproduct-format-main {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 5px;
-      font-size: 14px;
-    }
-    
-    .listproduct-format-main p {
-      text-align: left;
-    }
-    
-    .listproduct-format-main.listproduct-format img {
-      max-width: 100px;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .listproduct-format-main {
-      grid-template-columns: 1fr;
-    }
-    
-    .user {
-      padding: 10px;
-    }
-    
-    .listproduct-format-main.listproduct-format img {
-      max-width: 100%;
-    }
-  }
-  
+}

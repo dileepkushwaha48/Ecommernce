@@ -19,6 +19,11 @@ const Sidebar = () => {
           <p>Product List</p>
         </div>
       </Link>
+
+      {/* <Link to='/user' style={{ textDecoration:'none'}} >
+      
+    <p>Users</p>
+      </Link> */}
     </div>
   );
 }

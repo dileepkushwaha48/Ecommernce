@@ -34,6 +34,61 @@
 .listproduct-allproducts{
     overflow-y: auto;
 }
+
+
+
+
+/* Styling for the Export to PDF button */
+
+.container-btn {
+  display: flex; 
+  justify-content: flex-start; 
+  gap: 10px; 
+  margin-bottom: 20px; 
+}
+
+/* Styling for Export to PDF button */
+.container-btn .export-pdf {
+  background-color:#007bff ; 
+  border: none;
+  color: white; 
+  padding: 10px 20px; 
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px; 
+  transition: background-color 0.3s ease; 
+}
+
+.container-btn .export-pdf:hover {
+  background-color: #007bff; 
+}
+
+/* Styling for Export to Excel button */
+.container-btn .export-excel {
+  background-color: #28a745; 
+  border: none;
+  color: white; 
+  padding: 10px 20px; 
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px; 
+  transition: background-color 0.3s ease; 
+}
+
+.container-btn .export-excel:hover {
+  background-color: #28a745; 
+}
+
+.container-btn button:focus {
+  outline: none; 
+}
+
+
+
 @media(max-width:800px){
   .listproduct {
     box-sizing: border-box;
