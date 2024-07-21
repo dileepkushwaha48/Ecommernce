@@ -6,12 +6,12 @@ function Checkout() {
 
     useEffect(() => {
         if (window.Razorpay) {
-          console.log('Razorpay script loaded successfully');
+            console.log('Razorpay script loaded successfully');
         } else {
-          console.log('Razorpay script not loaded');
+            console.log('Razorpay script not loaded');
         }
-      }, []);
-     // this is for script   
+    }, []);
+
     const [checkoutInput, setCheckoutInput] = useState({
         firstname: '',
         lastname: '',
@@ -36,7 +36,7 @@ function Checkout() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         // Basic form validation
         if (!checkoutInput.firstname || !checkoutInput.lastname || !checkoutInput.phone || !checkoutInput.email || !checkoutInput.address || !checkoutInput.city || !checkoutInput.state || !checkoutInput.zipcode) {
             setError({ message: 'All fields are mandatory' });
@@ -56,14 +56,53 @@ function Checkout() {
         }, 500);
     };
 
+    const handleCashOnDelivery = () => {
+        setLoading(true);
+
+        // You can add backend call here to process Cash on Delivery order
+        axios.post('http://localhost:4000/create-order', {
+            ...checkoutInput,
+            paymentMethod: 'Cash on Delivery'
+        }).then(response => {
+            setLoading(false);
+            alert('Order placed successfully!');
+            // Optionally redirect to a thank you page or clear form inputs
+        }).catch(error => {
+            setLoading(false);
+            alert('your payment delivery on cash!');
+            console.error('Order creation error:', error);
+        });
+    };
+
+    const handleEsewaPayment = async () => {
+        setLoading(true);
+        try {
+            const orderResponse = await axios.post('http://localhost:4000/create-order', {
+                amount: 1000, // Amount in the smallest currency unit
+                currency: 'NPR',
+                paymentMethod: 'eSewa'
+            });
+
+            const { amount, currency, transactionId } = orderResponse.data;
+
+            // Here you would implement the eSewa payment flow
+            // For example, redirect to eSewa payment page
+            window.location.href = `https://esewa.com.np/epay/main?amt=${amount}&txAmt=0&psc=0&sc=0&pid=${transactionId}&su=http://localhost:4000/payment-success&fu=http://localhost:4000/payment-failure`;
+
+        } catch (error) {
+            console.error('Order creation error:', error);
+            // alert('Something went wrong. Please try again later.');
+        }
+        setLoading(false);
+    };
+
     // const handleRazorpayPayment = async () => {
     //     setLoading(true);
     //     try {
-    //         // Create an order on the backend
-    //         const orderResponse = await axios.post('http://localhost:4000/e-commerence', {
-    //             amount: 1000 * 100, // Amount in paise (e.g., 1000 * 100 = 100000 paise = 1000 INR)
+    //         const orderResponse = await axios.post('http://localhost:4000/create-order', {
+    //             amount: 1000 * 100, // Amount in paise
     //             currency: 'INR',
-    //             receipt: 'receipt_order_74394' // Unique receipt number
+    //             receipt: 'receipt_order_74394'
     //         });
 
     //         const { id, amount, currency } = orderResponse.data;
@@ -74,11 +113,10 @@ function Checkout() {
     //             currency: currency,
     //             name: 'Your Company Name',
     //             description: 'Test Transaction',
-    //             image: 'https://example.com/your_logo', // Optional logo
+    //             image: 'https://example.com/your_logo',
     //             order_id: id,
     //             handler: async function (response) {
     //                 try {
-    //                     // Verify payment on the backend
     //                     const verifyResponse = await axios.post('http://localhost:4000/verify-payment', {
     //                         razorpay_order_id: response.razorpay_order_id,
     //                         razorpay_payment_id: response.razorpay_payment_id,
@@ -91,8 +129,8 @@ function Checkout() {
     //                         alert('Payment verification failed!');
     //                     }
     //                 } catch (error) {
-    //                     alert('Payment verification failed!');
     //                     console.error('Verification error:', error);
+    //                     alert('Payment verification failed!');
     //                 }
     //             },
     //             prefill: {
@@ -108,80 +146,20 @@ function Checkout() {
     //             }
     //         };
 
-    //         const rzp1 = new window.Razorpay(options);
-    //         rzp1.open();
+    //         if (window.Razorpay) {
+    //             const rzp1 = new window.Razorpay(options);
+    //             rzp1.open();
+    //         } else {
+    //             console.error('Razorpay script is not loaded');
+    //             alert('Payment gateway is not available');
+    //         }
     //     } catch (error) {
-    //         alert('Something went wrong. Please try again later.');
     //         console.error('Order creation error:', error);
+    //         alert('Something went wrong. Please try again later.');
     //     }
     //     setLoading(false);
     // };
 
-
-    const handleRazorpayPayment = async () => {
-        setLoading(true);
-        try {
-            const orderResponse = await axios.post('http://localhost:4000/create-order', {
-                amount: 1000 * 100, // Amount in paise
-                currency: 'INR',
-                receipt: 'receipt_order_74394'
-            });
-    
-            const { id, amount, currency } = orderResponse.data;
-    
-            const options = {
-                key: 'YOUR_RAZORPAY_KEY_ID', // Replace with your Razorpay Key ID
-                amount: amount,
-                currency: currency,
-                name: 'Your Company Name',
-                description: 'Test Transaction',
-                image: 'https://example.com/your_logo',
-                order_id: id,
-                handler: async function (response) {
-                    try {
-                        const verifyResponse = await axios.post('http://localhost:4000/verify-payment', {
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature
-                        });
-    
-                        if (verifyResponse.data.status === 'success') {
-                            alert('Payment successful!');
-                        } else {
-                            alert('Payment verification failed!');
-                        }
-                    } catch (error) {
-                        console.error('Verification error:', error);
-                        alert('Payment verification failed!');
-                    }
-                },
-                prefill: {
-                    name: `${checkoutInput.firstname} ${checkoutInput.lastname}`,
-                    email: checkoutInput.email,
-                    contact: checkoutInput.phone,
-                },
-                notes: {
-                    address: checkoutInput.address
-                },
-                theme: {
-                    color: '#3399cc'
-                }
-            };
-    
-            if (window.Razorpay) {
-                const rzp1 = new window.Razorpay(options);
-                rzp1.open();
-            } else {
-                console.error('Razorpay script is not loaded');
-                alert('Payment gateway is not available');
-            }
-        } catch (error) {
-            console.error('Order creation error:', error);
-            alert('Something went wrong. Please try again later.');
-        }
-        setLoading(false);
-    };
-    
     return (
         <div className="container">
             <h2 className="text-center mb-5">Checkout</h2>
@@ -253,7 +231,9 @@ function Checkout() {
                                     <div className="col-md-12">
                                         <div className="form-group text-end">
                                             <button type="submit" className="btn btn-primary mx-1" disabled={loading}>Place Order</button>
-                                            <button type="button" className="btn btn-primary mx-1" onClick={handleRazorpayPayment} disabled={loading}>Pay by Razorpay</button>
+                                            {/* <button type="button" className="btn btn-primary mx-1" onClick={handleRazorpayPayment} disabled={loading}>Pay by Razorpay</button> */}
+                                            <button type="button" className="btn btn-primary mx-1" onClick={handleCashOnDelivery} disabled={loading}>Cash On Delivery</button>
+                                            <button type="button" className="btn btn-primary mx-1" onClick={handleEsewaPayment} disabled={loading}>Pay by eSewa</button>
                                         </div>
                                     </div>
                                 </div>
