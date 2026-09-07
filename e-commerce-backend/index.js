@@ -1,14 +1,9 @@
-const dns = require("dns");
 const express = require("express");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
-
-// Render's default DNS resolver can fail to resolve the SRV record that
-// mongodb+srv:// depends on (querySrv ENOTFOUND). Google's resolver handles it.
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -17,8 +12,11 @@ app.use(express.json());
 app.use(cors());
 
 // -------------------- MongoDB --------------------
+// Render's DNS resolver fails on the SRV lookup that mongodb+srv:// requires
+// (querySrv ENOTFOUND), so we connect with the standard mongodb:// scheme
+// against the resolved shard hosts instead, which only needs plain A records.
 mongoose.connect(
-  "mongodb+srv://mrdileepkushwaha11_db_user:qizLTTW4ZdK4hq4o@cluster0.0vn7noh.mongodb.net/footwear"
+  "mongodb://mrdileepkushwaha11_db_user:qizLTTW4ZdK4hq4o@ac-hx795bw-shard-00-00.0vn7noh.mongodb.net:27017,ac-hx795bw-shard-00-01.0vn7noh.mongodb.net:27017,ac-hx795bw-shard-00-02.0vn7noh.mongodb.net:27017/footwear?ssl=true&replicaSet=atlas-ug8rxy-shard-0&authSource=admin&retryWrites=true&w=majority"
 ).then(() => {
   console.log("MongoDB connected");
 }).catch((err) => {
