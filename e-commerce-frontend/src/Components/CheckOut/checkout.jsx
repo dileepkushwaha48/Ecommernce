@@ -83,7 +83,7 @@ function Checkout() {
                 paymentMethod: 'eSewa'
             });
 
-            const { amount, currency, transactionId } = orderResponse.data;
+            const { amount, transactionId } = orderResponse.data;
 
             
             // For example, redirect to eSewa payment page
