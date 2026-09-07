@@ -5,17 +5,19 @@ import Offers from '../Components/Offers/Offers'
 import NewCollections from '../Components/NewCollections/NewCollections'
 import NewsLetter from '../Components/NewsLetter/NewsLetter'
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const Shop = () => {
 
   const [popular, setPopular] = useState([]);
   const [newcollection, setNewCollection] = useState([]);
 
-  const fetchInfo = () => { 
-    fetch('http://localhost:4000/popularinwomen') 
-            .then((res) => res.json()) 
+  const fetchInfo = () => {
+    fetch(`${API_URL}/popularinwomen`)
+            .then((res) => res.json())
             .then((data) => setPopular(data))
-    fetch('http://localhost:4000/newcollections') 
-            .then((res) => res.json()) 
+    fetch(`${API_URL}/newcollections`)
+            .then((res) => res.json())
             .then((data) => setNewCollection(data))
     }
 

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "./CSS/LoginSignup.css";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const LoginSignup = () => {
 
   const [state,setState] = useState("Login");
@@ -11,49 +13,49 @@ const LoginSignup = () => {
     }
 
   const login = async () => {
-    let dataObj;
-    await fetch('http://localhost:4000/login', {
-      method: 'POST',
-      headers: {
-        Accept:'application/form-data',
-        'Content-Type':'application/json',
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((resp) => resp.json())
-      .then((data) => {dataObj=data});
-      console.log(dataObj);
-      if (dataObj.success) {
-        localStorage.setItem('auth-token',dataObj.token);
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem("auth-token", data.token);
         window.location.replace("/");
+      } else {
+        alert(data.errors);
       }
-      else
-      {
-        alert(dataObj.errors)
-      }
+    } catch {
+      alert("Unable to connect to the server. Please try again later.");
+    }
   }
 
   const signup = async () => {
-    let dataObj;
-    await fetch('http://localhost:4000/signup', {
-      method: 'POST',
-      headers: {
-        Accept:'application/form-data',
-        'Content-Type':'application/json',
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((resp) => resp.json())
-      .then((data) => {dataObj=data});
+    try {
+      const response = await fetch(`${API_URL}/signup`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
 
-      if (dataObj.success) {
-        localStorage.setItem('auth-token',dataObj.token);
+      if (data.success) {
+        localStorage.setItem("auth-token", data.token);
         window.location.replace("/");
+      } else {
+        alert(data.errors);
       }
-      else
-      {
-        alert(dataObj.errors)
-      }
+    } catch {
+      alert("Unable to connect to the server. Please try again later.");
+    }
   }
 
   return (

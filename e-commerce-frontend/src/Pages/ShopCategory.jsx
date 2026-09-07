@@ -4,13 +4,15 @@ import dropdown_icon from '../Components/Assets/dropdown_icon.png'
 import Item from "../Components/Item/Item";
 import { Link } from "react-router-dom";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const ShopCategory = (props) => {
 
   const [allproducts, setAllProducts] = useState([]);
 
-  const fetchInfo = () => { 
-    fetch('http://localhost:4000/allproducts') 
-            .then((res) => res.json()) 
+  const fetchInfo = () => {
+    fetch(`${API_URL}/allproducts`)
+            .then((res) => res.json())
             .then((data) => setAllProducts(data))
     }
 
